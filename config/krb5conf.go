@@ -80,6 +80,7 @@ type LibDefaults struct {
 	TicketLifetime        time.Duration //default 1 day
 	UDPPreferenceLimit    int           // 1 means to always use tcp. MIT krb5 has a default value of 1465, and it prevents user setting more than 32700.
 	VerifyAPReqNofail     bool          //default false
+	DisablePAC            bool          //default false
 }
 
 // Create a new LibDefaults struct.
@@ -113,6 +114,7 @@ func newLibDefaults() LibDefaults {
 		TicketLifetime:          time.Duration(24) * time.Hour,
 		UDPPreferenceLimit:      1465,
 		PreferredPreauthTypes:   []int{17, 16, 15, 14},
+		DisablePAC:              false,
 	}
 }
 
@@ -301,6 +303,12 @@ func (l *LibDefaults) parseLines(lines []string) error {
 				return InvalidErrorf("libdefaults section line (%s): %v", line, err)
 			}
 			l.VerifyAPReqNofail = v
+		case "disable_pac":
+			v, err := parseBoolean(p[1])
+			if err != nil {
+				return InvalidErrorf("libdefaults section line (%s): %v", line, err)
+			}
+			l.DisablePAC = v
 		default:
 			//Ignore the line
 			continue
